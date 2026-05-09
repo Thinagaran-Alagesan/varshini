@@ -11,6 +11,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Great+Vibes&display=swap" rel="stylesheet">
 
     <style>
+        video {
+            width: 100%;
+            height: auto;
+            min-height: 250px; /* Prevents the video from collapsing to 0 height */
+            background-color: #000; /* Shows black instead of transparent while loading */
+            border-radius: 10px;
+            display: block;
+            outline: none;
+            object-fit: cover;
+            
+            /* Forces mobile browsers to use Hardware Acceleration to draw the video */
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+        }
         /* --- General Mobile Reset & Constraints --- */
         * {
             box-sizing: border-box;
