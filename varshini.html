@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Happy Birthday Reddu ❤️</title>
+    
+    <!-- Google Fonts for elegant typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Great+Vibes&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- General Mobile Reset & Constraints --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent; /* Remove mobile tap highlight */
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Prevent default scrolling */
+            background: #050001; /* Fallback */
+            background: radial-gradient(circle at center, #250009 0%, #050001 100%);
+            font-family: 'Cormorant Garamond', serif;
+            color: #f8e1e4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            touch-action: none; /* Disable default touch actions */
+        }
+
+        /* Prevent zooming on older mobile devices */
+        @viewport {
+            width: device-width;
+            zoom: 1.0;
+        }
+
+        /* --- Global Canvas (Continuous Background Magic) --- */
+        #magic-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* --- Shared Styling for Heart Halves --- */
+        .heart {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transition: transform 1s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease-out;
+            filter: drop-shadow(0 0 15px rgba(255, 26, 60, 0.9));
+        }
+
+        .heart svg {
+            width: 100%;
+            height: 100%;
+            fill: #ff1a3c;
+        }
+
+        .left-half {
+            clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);
+            transform-origin: center left;
+        }
+
+        .right-half {
+            clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%);
+            transform-origin: center right;
+        }
+
+        /* ========================================= */
+        /* == STAGE 1: Initial Heart + Disappear == */
+        /* ========================================= */
+        .heart-stage-1-wrapper {
+            position: relative;
+            width: 130px; /* Sizing for mobile */
+            height: 130px;
+            z-index: 10;
+            cursor: pointer;
+            transition: opacity 1s, transform 1.2s;
+        }
+
+        .heart-stage-1-wrapper.open {
+            transform: scale(0); /* Make it vanish while sparkling */
+            opacity: 0;
+        }
+
+        .instruction-stage-1 {
+            position: absolute;
+            top: 130%;
+            width: 100%;
+            text-align: center;
+            font-size: 1rem;
+            color: #ff99aa;
+            letter-spacing: 2px;
+            animation: pulse-glow 2s infinite alternate;
+            white-space: nowrap;
+        }
+
+        @keyframes pulse-glow {
+            0% { opacity: 0.6; text-shadow: 0 0 5px rgba(255,153,170,0.4); }
+            100% { opacity: 1; text-shadow: 0 0 10px rgba(255,153,170,0.8); }
+        }
+
+        /* ========================================== */
+        /* == STAGE 2: Message Content + End Heart == */
+        /* ========================================== */
+        .message-content-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            padding: 40px 25px; /* Adjust padding for mobile edges */
+            opacity: 0;
+            visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around; /* Spread content out vertically */
+            align-items: center;
+            text-align: center;
+            transition: opacity 2s, visibility 2s;
+            overflow-y: auto; /* Allow scrolling content only in this container */
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .message-content-wrapper.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .greeting {
+            font-family: 'Great Vibes', cursive;
+            font-size: 2.8rem;
+            color: #ff3355;
+            margin-top: 10px;
+            text-shadow: 0 0 10px rgba(255, 51, 85, 0.4);
+        }
+
+        .text-block p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 12px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .spacer { height: 10px; }
+
+        .signature {
+            font-family: 'Great Vibes', cursive;
+            font-size: 2.2rem;
+            color: #ff3355;
+            margin-top: 15px;
+            margin-bottom: 25px;
+            text-shadow: 0 0 10px rgba(255, 51, 85, 0.4);
+        }
+
+        /* --- The 2nd Heart at end --- */
+        .heart-stage-2-wrapper {
+            position: relative;
+            width: 90px; /* Slightly smaller for the end */
+            height: 90px;
+            cursor: pointer;
+            flex-shrink: 0; /* Prevent collapsing if space is tight */
+            transition: all 1s;
+        }
+
+        .heart-stage-2-wrapper.open {
+            transform: scale(0);
+            opacity: 0;
+        }
+
+        /* ======================================= */
+        /* == STAGE 3: Video Player + Decor == */
+        /* ======================================= */
+        .video-stage-wrapper {
+            position: absolute;
+            width: 90vw; /* Take up width */
+            max-width: 400px;
+            z-index: 15;
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.7);
+            transition: all 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .video-stage-wrapper.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+        }
+
+        /* --- FLOWER BORDER DECOR --- */
+        .decorative-frame {
+            position: relative;
+            width: 100%;
+            padding: 15px; /* Border thickness area */
+            background: linear-gradient(45deg, #250009 0%, #050001 100%);
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(255, 51, 85, 0.6);
+            /* Simulating a fancy decorative ornate border with box-shadows */
+        }
+
+        /* Corner "Flowers" using CSS pseudo-elements */
+        .decorative-frame::before, .decorative-frame::after {
+            content: "✿"; /* A beautiful unicode floral symbol */
+            position: absolute;
+            font-size: 2.5rem;
+            color: #ffcccc;
+            text-shadow: 0 0 10px #ff3355;
+        }
+        
+        .decorative-frame::before { top: -15px; left: -15px; }
+        .decorative-frame::after { bottom: -15px; right: -15px; }
+
+        /* Extra decor elements */
+        .frame-corner-tr, .frame-corner-bl {
+            position: absolute;
+            font-size: 2.5rem;
+            color: #ffcccc;
+            text-shadow: 0 0 10px #ff3355;
+        }
+        .frame-corner-tr { top: -15px; right: -15px; }
+        .frame-corner-bl { bottom: -15px; left: -15px; }
+
+        video {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            display: block;
+            outline: none;
+            object-fit: cover; /* Fill the frame space appropriately */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Magic -->
+    <canvas id="magic-canvas"></canvas>
+
+    <!-- STATE 1: Starting Heart -->
+    <div class="heart-stage-1-wrapper" id="heart1" onclick="handleHeart1Click()">
+        <div class="heart left-half">
+            <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        </div>
+        <div class="heart right-half">
+            <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        </div>
+        <div class="instruction-stage-1">Tap my heart...</div>
+    </div>
+
+    <!-- STATE 2: Birthday Wishing Text + 2nd Heart -->
+    <div class="message-content-wrapper" id="messageStage">
+        <div class="greeting">Oii Reddu… ❤️</div>
+        
+        <div class="text-block">
+            <p>Every time you wear red, the world forgets every other color.</p>
+            <p>Maybe that’s because you don’t just wear red… you make it feel like love itself.</p>
+            <p>And every time I see you, my heart still skips quietly like the very first day.</p>
+        </div>
+        
+        <div class="spacer"></div>
+        
+        <div class="text-block">
+            <p>Varshini, you turned ordinary moments into the most beautiful memories of my life.</p>
+            <p>Your smile already colors my world — the red dress is just a bonus.</p>
+            <p>Among all the things life gave me, meeting you feels the most special.</p>
+        </div>
+        
+        <div class="spacer"></div>
+        
+        <div class="text-block">
+            <p>If love ever had a favorite color, it would definitely look like you in red.</p>
+            <p>Happy Birthday to the girl I silently admire, deeply care for, and endlessly cherish…</p>
+        </div>
+        
+        <div class="signature">Happy Birthday, my Reddu</div>
+
+        <!-- 2nd Heart to trigger Video -->
+        <div class="heart-stage-2-wrapper" id="heart2" onclick="handleHeart2Click()">
+            <div class="heart left-half">
+                <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </div>
+            <div class="heart right-half">
+                <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </div>
+            <div class="instruction-stage-1" style="top: -25px; font-size: 0.8rem;">Tap once more</div>
+        </div>
+    </div>
+
+    <!-- STATE 3: Decorated Video Stage -->
+    <div class="video-stage-wrapper" id="videoStage">
+        <div class="decorative-frame">
+            <!-- Functional Decorative Flowers at corners -->
+            <span class="frame-corner-tr">✿</span>
+            <span class="frame-corner-bl">✿</span>
+            
+            <video id="momorieVideo" preload="auto">
+                <source src="momorie.mp4" type="video/mp4">
+                Your phone does not support the video tag.
+            </video>
+        </div>
+    </div>
+
+    <script>
+        // --- Interactions State Management ---
+        const h1Wrapper = document.getElementById('heart1');
+        const mStage = document.getElementById('messageStage');
+        const h2Wrapper = document.getElementById('heart2');
+        const vStage = document.getElementById('videoStage');
+        const video = document.getElementById('momorieVideo');
+
+        // Logic for first heart: split, then disappear with sparkling burst
+        function handleHeart1Click() {
+            if(!h1Wrapper.classList.contains('open')) {
+                h1Wrapper.classList.add('open');
+                
+                // Trigger an intense burst of sparkles at the heart's position
+                const rect = h1Wrapper.getBoundingClientRect();
+                triggerHeartBurst(rect.left + rect.width/2, rect.top + rect.height/2);
+
+                // Transition to message state
+                setTimeout(() => {
+                    mStage.classList.add('active');
+                }, 800); // Fades in as heart fades out
+            }
+        }
+
+        // Logic for second heart: split, then disappear, then show video
+        function handleHeart2Click() {
+            if(!h2Wrapper.classList.contains('open')) {
+                h2Wrapper.classList.add('open');
+                
+                // Content fades out
+                mStage.classList.remove('active');
+
+                // Trigger another burst
+                const rect = h2Wrapper.getBoundingClientRect();
+                triggerHeartBurst(rect.left + rect.width/2, rect.top + rect.height/2);
+
+                // Transition to video state
+                setTimeout(() => {
+                    vStage.classList.add('active');
+                    // Mobile autoplay is tricky, better to explicitly play
+                    video.play().catch(error => {
+                        console.log("Autoplay blocked, showing video controls");
+                        video.controls = true; // Show controls as fallback
+                    });
+                }, 1000);
+            }
+        }
+
+        // Video ended logic
+        video.onended = function() {
+            mStage.classList.add('active'); // Fade message content back in
+            vStage.classList.remove('active'); // Remove video stage
+            video.controls = false; // reset in case controls were shown
+        };
+
+
+        // ===========================================
+        // = CANVAS MAGIC (Background & Interactivity) =
+        // ===========================================
+        const canvas = document.getElementById('magic-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        let width, height;
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        const particles = [];
+        const continuousCrackers = [];
+        const floatingSparkles = [];
+
+        // Sparkle Colors (Romantic Palette)
+        const romanticColors = ['#ff1a3c', '#ff6680', '#ffffff', '#ffcc00', '#ff99aa'];
+
+        class Particle {
+            constructor(x, y, color, speedScale = 1, lifeScale = 1) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.radius = Math.random() * 2 + 1;
+                const angle = Math.random() * Math.PI * 2;
+                const speed = (Math.random() * 5 + 2) * speedScale;
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+                this.friction = 0.95;
+                this.gravity = 0.05;
+                this.alpha = 1;
+                this.decay = (Math.random() * 0.015 + 0.01) * lifeScale;
+            }
+            update() {
+                this.vx *= this.friction;
+                this.vy *= this.friction;
+                this.vy += this.gravity;
+                this.x += this.vx;
+                this.y += this.vy;
+                this.alpha -= this.decay;
+            }
+            draw() {
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.fill();
+                ctx.shadowBlur = 0; // reset
+            }
+        }
+
+        class FloatingSparkle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.size = Math.random() * 2;
+                this.speedY = Math.random() * -0.3 - 0.1;
+                this.alpha = Math.random();
+                this.fadingOut = Math.random() > 0.5;
+            }
+            update() {
+                this.y += this.speedY;
+                if (this.y < 0) this.y = height;
+                
+                // Twinkle effect
+                if (this.fadingOut) { this.alpha -= 0.005; if (this.alpha <= 0.1) this.fadingOut = false; }
+                else { this.alpha += 0.005; if (this.alpha >= 0.8) this.fadingOut = true; }
+            }
+            draw() {
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = '#fce8eb';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        class CrackerParticle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = height + 10;
+                this.targetY = Math.random() * height / 2;
+                this.vy = Math.random() * -3 - 2;
+                this.exploded = false;
+                this.color = romanticColors[Math.floor(Math.random()*romanticColors.length)];
+            }
+            update() {
+                if(!this.exploded) {
+                    this.y += this.vy;
+                    if(this.y <= this.targetY) {
+                        this.exploded = true;
+                        // Small subtle explosion
+                        for(let i=0; i<15; i++) {
+                            particles.push(new Particle(this.x, this.y, this.color, 0.4, 0.7));
+                        }
+                    }
+                }
+            }
+            draw() {
+                if(!this.exploded) {
+                    ctx.fillStyle = '#fff';
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, 1.5, 0, Math.PI*2);
+                    ctx.fill();
+                }
+            }
+        }
+
+        // Initialize sparkles
+        for (let i = 0; i < 70; i++) floatingSparkles.push(new FloatingSparkle());
+
+        // Intense burst for heart click
+        function triggerHeartBurst(x, y) {
+            for (let i = 0; i < 100; i++) {
+                particles.push(new Particle(x, y, romanticColors[Math.floor(Math.random()*romanticColors.length)], 1.8, 0.6));
+            }
+        }
+
+        // Animation Loop
+        function animate() {
+            // Background blend
+            ctx.fillStyle = 'rgba(5, 0, 1, 0.2)'; // Fades trails
+            ctx.fillRect(0, 0, width, height);
+            ctx.globalAlpha = 1;
+
+            // Handle Continuous Background Sparkles
+            floatingSparkles.forEach(s => { s.update(); s.draw(); });
+
+            // Handle Continuous subtle crackers
+            if(Math.random() < 0.015) continuousCrackers.push(new CrackerParticle());
+            for (let i = continuousCrackers.length - 1; i >= 0; i--) {
+                continuousCrackers[i].update();
+                continuousCrackers[i].draw();
+                if(continuousCrackers[i].exploded) continuousCrackers.splice(i,1);
+            }
+
+            // Handle Explosion Particles
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.update();
+                p.draw();
+                if (p.alpha <= 0) particles.splice(i, 1);
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+    </script>
+</body>
+</html>
